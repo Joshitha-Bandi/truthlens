@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthLens — AI Content Credibility Analyzer</title>
+    <meta name="description"
+        content="TruthLens uses AI to analyze web content for credibility, detect scams, hate speech, and misleading information. Paste any URL and get an instant truth score.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+</head>
+
+<body>
+
+    <!-- ═══ BACKGROUND EFFECTS ═══ -->
+    <div class="bg-effects">
+        <div class="bg-gradient-orb"></div>
+        <div class="bg-gradient-orb"></div>
+        <div class="bg-gradient-orb"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-noise"></div>
+    </div>
+
+    <div class="app-container">
+
+        <!-- ═══ NAVBAR ═══ -->
+        <nav class="navbar">
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">🔍</div>
+                <div class="nav-title">Truth<span>Lens</span></div>
+            </a>
+            <div class="nav-actions">
+                <button class="nav-btn lang-btn active" data-lang="en" id="lang-en">EN</button>
+                <button class="nav-btn lang-btn" data-lang="te" id="lang-te">తెలుగు</button>
+                <button class="nav-btn" id="history-btn">
+                    🕰️ <span class="history-btn-text">History</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ═══ HERO ═══ -->
+        <section class="hero" id="hero-section">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                AI-Powered Analysis
+            </div>
+            <h1>
+                Verify Before You<br>
+                <span class="gradient-text">Trust & Share</span>
+            </h1>
+            <p class="hero-desc">
+                TruthLens analyzes any webpage for credibility, detects scams, hate speech,
+                and misleading content — giving you a clear truth score in seconds.
+            </p>
+        </section>
+
+        <!-- ═══ SEARCH ═══ -->
+        <section class="search-section" id="search-section">
+            <div class="search-box">
+                <span class="search-icon">🌐</span>
+                <input type="url" id="url-input" class="search-input" placeholder="Paste any article URL to analyze..."
+                    autocomplete="off" spellcheck="false">
+                <button class="search-btn" id="analyze-btn">
+                    <span id="analyze-btn-text">🔍 Analyze</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ═══ LOADING ═══ -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner">
+                <div class="ring"></div>
+                <div class="ring"></div>
+                <div class="ring"></div>
+            </div>
+            <div class="loading-text">Analyzing Content</div>
+            <div class="loading-sub">This may take a few seconds...</div>
+            <div class="loading-steps">
+                <div class="loading-step">
+                    <div class="step-icon">1</div>
+                    <span class="step-text">Fetching webpage content...</span>
+                </div>
+                <div class="loading-step">
+                    <div class="step-icon">2</div>
+                    <span class="step-text">Extracting text & metadata...</span>
+                </div>
+                <div class="loading-step">
+                    <div class="step-icon">3</div>
+                    <span class="step-text">Running AI credibility analysis...</span>
+                </div>
+                <div class="loading-step">
+                    <div class="step-icon">4</div>
+                    <span class="step-text">Calculating truth score...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ ERROR ═══ -->
+        <div class="error-section" id="error-section">
+            <div class="error-card">
+                <div class="error-icon">⚠️</div>
+                <div class="error-title" id="error-title">Analysis Failed</div>
+                <div class="error-message" id="error-msg">Something went wrong. Please check the URL and try again.
+                </div>
+                <br>
+                <button class="search-btn" onclick="backToHome()" style="margin: 0 auto;">
+                    ← Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══ RESULTS ═══ -->
+        <section class="results-section" id="results-section">
+            <div class="results-header">
+                <div>
+                    <div class="results-title" id="result-title-display">Analysis Results</div>
+                    <div class="results-url" id="result-url-display"></div>
+                </div>
+                <button class="results-back-btn" id="back-btn">← New Analysis</button>
+            </div>
+
+            <div class="results-grid">
+                <!-- Truth Score -->
+                <div class="card" id="truth-score-card"></div>
+
+                <!-- Domain Info -->
+                <div class="card" id="domain-card"></div>
+
+                <!-- Summary -->
+                <div class="card card-full" id="summary-card"></div>
+
+                <!-- Warnings -->
+                <div class="card card-full" id="warnings-card"></div>
+            </div>
+        </section>
+
+        <!-- ═══ FOOTER ═══ -->
+        <footer class="footer">
+            <div class="footer-text">
+                Built with <span class="heart">♥</span> by TruthLens Team &middot; AI-Powered Credibility Analysis
+            </div>
+        </footer>
+    </div>
+
+    <!-- ═══ HISTORY PANEL ═══ -->
+    <div class="history-backdrop" id="history-backdrop"></div>
+    <div class="history-panel" id="history-panel">
+        <div class="history-header">
+            <div class="history-title">🕰️ Analysis History</div>
+            <button class="history-close" id="history-close-btn">✕</button>
+        </div>
+        <div class="history-list" id="history-list">
+            <div class="history-empty">
+                <div class="history-empty-icon">🕰️</div>
+                <p>No analyses yet. Try analyzing a URL!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TOASTS ═══ -->
+    <div id="toast-container"></div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
